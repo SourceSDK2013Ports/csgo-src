@@ -2,4 +2,7 @@ This project is aimed to improve the leaked CS:GO code, to make it more stable a
 
 Partially used code from https://github.com/SwagSoftware/Kisak-Strike (some econ stuff, weapon recoil).
 
-Scaleform was removed.
+Features:
+- Removed Scaleform;
+- Filesystem from TF2 leak (less hardcoded stuff, allows for 'custom' folder, etc);
+- Some VGUI stuff and complete GameUI ported from TF2 leak;
