@@ -1863,20 +1863,16 @@ bool CEngineVGui::Key_Event( const InputEvent_t &event )
 			{
 				HideConsole();
 			}
-			else if ( IsGameUIVisible()  )
+			else if ( IsGameUIVisible() )
 			{
-				// gameui_hide on console start button but not ESC key.
-				if ( baseButtonCode != KEY_ESCAPE )
+				// Don't allow hiding of the game ui if there's no level
+				const char *pLevelName = engineClient->GetLevelName();
+				if ( pLevelName && pLevelName[0] )
 				{
-					// Don't allow hiding of the game ui if there's no level
-					const char *pLevelName = engineClient->GetLevelName();
-					if ( pLevelName && pLevelName[0] )
+					Cbuf_AddText( Cbuf_GetCurrentPlayer(), "gameui_hide" );
+					if ( IsDebugSystemVisible() )
 					{
-						Cbuf_AddText( Cbuf_GetCurrentPlayer(), "gameui_hide" );
-						if ( IsDebugSystemVisible() )
-						{
-							Cbuf_AddText( Cbuf_GetCurrentPlayer(), "debugsystemui 0" );
-						}
+						Cbuf_AddText( Cbuf_GetCurrentPlayer(), "debugsystemui 0" );
 					}
 				}
 			}
