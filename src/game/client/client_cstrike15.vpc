@@ -1,0 +1,423 @@
+//-----------------------------------------------------------------------------
+//	CLIENT_CSTRIKE15.VPC
+//  
+//	Project Script  
+//-----------------------------------------------------------------------------
+ 
+$Macro SRCDIR		"..\.."
+$Macro GAMENAME 	"csgo"
+
+$Include "$SRCDIR\game\client\client_base.vpc"
+$Include "$SRCDIR\game\shared\cstrike15\cstrike15_gcmessages_include.vpc" [!$X360 && !$PS3]
+$include "$SRCDIR\game\shared\cstrike15\cstrike15_usermessages_include.vpc"
+$Include "$SRCDIR\game\client\client_econ_base.vpc" [!$X360 && !$PS3]
+
+$include "$SRCDIR\external\external.vpc"
+$include "$SRCDIR\external\$EXTERNALCRYPTOPP\external_cryptopp.vpc"
+
+$Configuration "Debug"
+{
+	$Linker [$X360]
+	{
+		$AdditionalDependencies			"$BASE xonlined.lib xpartyd.lib"
+	}
+}
+
+$Configuration "Release"
+{
+	$Linker [$X360]
+	{
+		$AdditionalDependencies			"$BASE xonline.lib xparty.lib"
+	}
+}
+
+$Configuration
+{
+	$Compiler
+	{
+		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\game\shared\cstrike15\control,.\cstrike15,.\cstrike15\control,.\cstrike15\VGUI,$SRCDIR\game\shared\cstrike15"
+		$PreprocessorDefinitions		"$BASE;CSTRIKE_CLIENT_DLL;CSTRIKE_DLL;VERSION_SAFE_STEAM_API_INTERFACES;USE_ECONOMY_FEATURES"
+		$PreprocessorDefinitions		"$BASE;ALLOW_TEXT_MODE=1" [$CSTRIKE_TRUNK_BUILD||$CSTRIKE_STAGING_BUILD]
+
+		$ForceIncludes				"tier0\platform.h" [$WINDOWS||$POSIX]
+	}
+
+	$Linker
+	{
+		$AdditionalDependencies				"$BASE Ws2_32.lib odbc32.lib odbccp32.lib Shlwapi.lib Imm32.lib" [$WINDOWS]
+		$AdditionalDependencies				"$BASE libspurs_stub.a libspurs_jq_stub.a libsysutil_stub.a libsysutil_game_stub.a libnetctl_stub.a libsysutil_userinfo_stub.a"	[$PS3]
+	}
+
+}
+
+$Project "Client (CSGO)"
+{
+	$Folder	"Source Files"
+	{
+		-$File	"$SRCDIR\game\shared\weapon_parse_default.cpp"
+		-$File	"c_mod_lesson_stubs.cpp"
+		
+		$File	"c_team_objectiveresource.cpp"
+		$File	"c_team_objectiveresource.h"
+		$File	"hud_base_account.cpp"
+		$File	"hud_base_account.h"
+		$File	"$SRCDIR\game\shared\bannedwords.h"
+		$File	"$SRCDIR\game\shared\bannedwords.cpp"
+		$File	"hud_voicestatus.cpp"
+		$File	"hud_baseachievement_tracker.cpp"
+		$File	"hud_baseachievement_tracker.h"
+		$File	"$SRCDIR\game\shared\predicted_viewmodel.cpp"
+		$File	"$SRCDIR\game\shared\predicted_viewmodel.h"
+		$File	"$SRCDIR\game\shared\cstrike15\player_pickup.h"
+		$File	"$SRCDIR\game\shared\cstrike15\player_pickup.cpp"
+
+		$File	"$SRCDIR\public\zip\XUnzip.h"
+		$File	"$SRCDIR\public\zip\XZip.h" 
+
+		$File	"$SRCDIR\public\XZip.cpp" \
+				"$SRCDIR\public\XUnzip.cpp"\
+				"$SRCDIR\tier1\fileio.cpp"\
+				"$SRCDIR\utils\common\bsplib.cpp"\
+				"$SRCDIR\public\filesystem_init.cpp"\
+				"$SRCDIR\utils\common\filesystem_tools.cpp"\
+				"$SRCDIR\utils\common\cmdlib.cpp"\
+				"$SRCDIR\utils\common\scriplib.cpp"\
+				"$SRCDIR\public\lumpfiles.cpp"\
+				"$SRCDIR\public\zip_utils.cpp"
+		{
+			$Configuration
+			{
+				$Compiler
+				{
+					$Create/UsePrecompiledHeader	"Not Using Precompiled Headers" // This file compiles into several projects, some of which don't use pch
+					// The 'force include' directive used for this project defines the time_t type and methods before 
+					// we can set the #define to force 32 bit time. Adding it here fixes that.
+					$PreprocessorDefinitions		"$BASE;_USE_32BIT_TIME_T"		[!$WIN64]
+				}
+			}
+		}
+		$File	"$SRCDIR\filesystem\linux_support.cpp" [$POSIX]
+		{
+			$Configuration
+			{
+				$Compiler
+				{
+					$Create/UsePrecompiledHeader	"Not Using Precompiled Headers" // This file compiles into several projects, some of which don't use pch
+					// The 'force include' directive used for this project defines the time_t type and methods before 
+					// we can set the #define to force 32 bit time. Adding it here fixes that.
+					$PreprocessorDefinitions		"$BASE;_USE_32BIT_TIME_T"		[!$WIN64]
+				}
+			}
+		}
+
+		$Folder	"Economy" [!$X360 && !$PS3]
+		{
+//			$Folder	"Store"
+//			{
+//				$File	"$SRCDIR\game\client\econ\store\store_page.cpp"
+//				$File	"$SRCDIR\game\client\econ\store\store_page_halloween.cpp"
+//				$File	"$SRCDIR\game\client\econ\store\store_page_new.cpp"
+//				$File	"$SRCDIR\game\client\econ\store\store_panel.cpp"
+//				$File	"$SRCDIR\game\client\econ\store\store_preview_item.cpp"
+//				$File	"$SRCDIR\game\client\econ\store\store_viewcart.cpp"
+//			}
+
+			$File	"$SRCDIR\game\shared\cstrike15\cstrike15_item_inventory.cpp"
+			$File	"$SRCDIR\game\shared\cstrike15\cstrike15_item_inventory.h"
+			
+			$File	"$SRCDIR\game\shared\cstrike15\cstrike15_item_system.cpp"
+			$File	"$SRCDIR\game\shared\cstrike15\cstrike15_item_system.h"
+			$File	"$SRCDIR\game\shared\cstrike15\cstrike15_item_schema.cpp"
+			$File	"$SRCDIR\game\shared\cstrike15\cstrike15_item_schema.h"
+			$File	"$SRCDIR\game\shared\cstrike15\cstrike15_item_constants.h"
+			$File	"$SRCDIR\game\shared\cstrike15\cstrike15_gcconstants.h"
+
+			$File	"$SRCDIR/game/shared/cstrike15/cs_econ_item_string_table.cpp"
+			$File	"$SRCDIR/game/shared/cstrike15/cs_econ_item_string_table.h"
+			$File	"$SRCDIR/game/shared/econ/econ_game_account_client.h"
+			$File	"$SRCDIR/game/shared/econ/econ_game_account_client.cpp"
+		}
+
+		$Folder	"CounterStrike DLL"
+		{
+			$File	"$SRCDIR\game\shared\cstrike15\cs_achievement_constants.h"
+			$File	"$SRCDIR\game\shared\cstrike15\cs_achievementdefs.h"
+			$File	"$SRCDIR\game\shared\cstrike15\achievements_cs.cpp"
+			$File	"$SRCDIR\game\shared\cstrike15\achievements_cs.h"
+			$File	"$SRCDIR\game\shared\cstrike15\basecsgrenade_projectile.cpp"
+			$File	"$SRCDIR\game\shared\cstrike15\cs_player_rank_shared.h"
+			$File	"cstrike15\cs_gameplay_hints.cpp"
+			$File	"cstrike15\cs_gameplay_hints.h"
+			$File	"cstrike15\cs_player_rank_mgr.cpp"
+			$File	"cstrike15\cs_player_rank_mgr.h"
+			$File	"cstrike15\c_cs_lesson.cpp"
+			$File	"cstrike15\c_cs_hostage.cpp"
+			$File	"cstrike15\c_cs_hostage.h"
+			$File	"cstrike15\c_cs_player.cpp"
+			$File	"cstrike15\c_cs_player.h"
+			$File	"cstrike15\c_cs_playerresource.cpp"
+			$File	"cstrike15\c_cs_playerresource.h"
+			$File	"cstrike15\c_cs_team.cpp"
+			$File	"cstrike15\c_cs_team.h"
+			$File	"cstrike15\c_csrootpanel.cpp"
+			$File	"cstrike15\c_csrootpanel.h"
+			$File	"cstrike15\c_plantedc4.cpp"
+			$File	"cstrike15\c_plantedc4.h"
+			$File	"cstrike15\c_te_radioicon.cpp"
+			$File	"cstrike15\c_te_shotgun_shot.cpp"
+			$File	"cstrike15\clientmode_csnormal.cpp"
+			$File	"cstrike15\clientmode_csnormal.h"
+			$File	"$SRCDIR\game\shared\cstrike15\cs_ammodef.cpp"
+			$File	"$SRCDIR\game\shared\cstrike15\cs_ammodef.h"
+			$File	"$SRCDIR\game\shared\cstrike15\cs_gamemovement.cpp"
+			$File	"$SRCDIR\game\shared\cstrike15\cs_gamerules.cpp"
+			$File	"$SRCDIR\game\shared\cstrike15\cs_gamerules.h"
+			$File	"$SRCDIR\game\shared\cstrike15\cs_gamestats_shared.cpp"
+			$File	"$SRCDIR\game\shared\cstrike15\cs_gamestats_shared.h"
+			$File	"cstrike15\cs_in_main.cpp"
+			$File	"$SRCDIR\game\shared\cstrike15\cs_player_shared.cpp"
+			$File	"$SRCDIR\game\shared\cstrike15\cs_playeranimstate.cpp"
+			$File	"$SRCDIR\game\shared\cstrike15\cs_playeranimstate.h"
+			$File	"$SRCDIR\game\shared\cstrike15\csgo_playeranimstate.cpp"
+			$File	"$SRCDIR\game\shared\cstrike15\csgo_playeranimstate.h"
+			$File	"cstrike15\cs_prediction.cpp"
+			$File	"$SRCDIR\game\shared\cstrike15\cs_shareddefs.cpp"
+			$File	"cstrike15\cs_client_gamestats.cpp"
+			$File	"cstrike15\cs_client_gamestats.h"
+			$File	"steamworks_gamestats_client.h"
+			$File	"steamworks_gamestats_client.cpp"
+			$File	"cstrike15\cs_view_scene.cpp"
+			$File	"cstrike15\cs_view_scene.h"
+			$File	"$SRCDIR\game\shared\cs_custom_material_swap.cpp"
+			$File	"$SRCDIR\game\shared\cs_custom_material_swap.h"
+			$File	"cstrike15\cs_custom_clothing_visualsdata_processor.cpp"
+			$File	"cstrike15\cs_custom_clothing_visualsdata_processor.h"
+			$File	"cstrike15\cs_custom_epidermis_visualsdata_processor.cpp"
+			$File	"cstrike15\cs_custom_epidermis_visualsdata_processor.h"
+			$File	"cstrike15\cs_custom_weapon_visualsdata_processor.cpp"
+			$File	"cstrike15\cs_custom_weapon_visualsdata_processor.h"
+			$File	"cstrike15\cs_custom_embroider_visualsdata_processor.cpp"
+			$File	"cstrike15\cs_custom_embroider_visualsdata_processor.h"
+			$File	"cstrike15\cs_custom_texture_saver.cpp"
+			$File	"cstrike15\cs_custom_texture_saver.h"
+			$File	"$SRCDIR\game\client\model_combiner.cpp"
+			$File	"$SRCDIR\game\client\model_combiner.h"
+			$File	"$SRCDIR\game\shared\cstrike15\cs_weapon_parse.cpp"
+			$File	"$SRCDIR\game\shared\cstrike15\cs_weapon_parse.h"
+			$File	"cstrike15\fx_cs_blood.cpp"
+			$File	"cstrike15\fx_cs_impacts.cpp"
+			$File	"cstrike15\fx_cs_knifeslash.cpp"
+			$File	"cstrike15\fx_cs_muzzleflash.cpp"
+			$File	"$SRCDIR\game\shared\cstrike15\fx_cs_shared.cpp"
+			$File	"cstrike15\fx_cs_weaponfx.cpp"
+			$File	"cstrike15\fx_cs_christmaslights.cpp"
+			$File	"$SRCDIR\game\shared\cstrike15\bot\shared_util.cpp"
+			$File	"$SRCDIR\game\shared\cstrike15\bot\shared_util.h"
+			$File	"$SRCDIR\game\shared\cstrike15\viewmodel_arm_config.inc"
+			$File	"cstrike15\vgui_rootpanel_cs.cpp"
+			$File	"$SRCDIR\game\shared\ugc_workshop_manager.cpp"
+			$File	"$SRCDIR\game\shared\ugc_workshop_manager.h"
+			$File	"$SRCDIR\game\shared\cstrike15\cs_workshop_manager.cpp"
+			$File	"$SRCDIR\game\shared\cstrike15\cs_workshop_manager.h"
+			$File	"$SRCDIR\common\platforminputdevice.h"
+			$File	"$SRCDIR\common\platforminputdevice.cpp"
+			{
+				$Configuration
+				{
+					$Compiler
+					{
+						$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
+					}
+				}
+			}
+
+			$File	"$SRCDIR\public\gametypes\igametypes.h"
+			$File	"$SRCDIR\game\shared\cstrike15\gametypes.h"
+			$File	"$SRCDIR\game\shared\cstrike15\gametypes.cpp"  
+			{
+				$Configuration
+				{
+					$Compiler
+					{
+						$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
+					}
+				}
+			}
+            
+			$Folder "HUD Elements"
+			{
+				$File	"cstrike15\cs_hud_achievement_announce.cpp"
+				$File	"cstrike15\cs_hud_achievement_announce.h"
+				$File	"cstrike15\cs_hud_achievement_tracker.cpp"
+				$File	"cstrike15\cs_hud_ammo.cpp"
+				$File	"cstrike15\cs_hud_chat.cpp"
+				$File	"cstrike15\cs_hud_chat.h"
+				$File	"cstrike15\cs_hud_damageindicator.cpp"
+				$File	"cstrike15\cs_hud_freezepanel.cpp"
+				$File	"cstrike15\cs_hud_freezepanel.h"
+				$File	"cstrike15\cs_hud_health.cpp"
+				$File	"cstrike15\cs_hud_playerhealth.cpp"
+				$File	"cstrike15\cs_hud_playerhealth.h"
+				$File	"cstrike15\cs_hud_scope.cpp"
+				$File	"cstrike15\cs_hud_weaponselection.cpp"
+				$File	"cstrike15\cs_hud_weaponselection.h"
+				$File	"cstrike15\hud_account.cpp"
+				$File	"cstrike15\hud_armor.cpp"
+				$File	"cstrike15\hud_deathnotice.cpp"
+				$File	"cstrike15\hud_defuser.cpp"
+				$File	"cstrike15\hud_flashbang.cpp"
+				$File	"cstrike15\hud_hostagerescue.cpp"
+				$File	"cstrike15\hud_progressbar.cpp"
+				$File	"cstrike15\hud_radar.cpp"
+				$File	"cstrike15\hud_radar.h"
+				$File	"cstrike15\hud_roundtimer.cpp"
+				$File	"cstrike15\hud_scenarioicon.cpp"
+				$File	"cstrike15\hud_shopping_cart.cpp"
+				$File	"cstrike15\radio_status.cpp"
+				$File	"cstrike15\radio_status.h"
+			}
+			
+			$Folder "Weapon"
+			{
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_basecsgrenade.cpp"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_basecsgrenade.h"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_c4.cpp"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_c4.h"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_csbase.cpp"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_csbase.h"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_csbasegun.cpp"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_csbasegun.h"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_deagle.cpp"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_elite.cpp"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_flashbang.cpp"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_flashbang.h"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_hegrenade.cpp"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_ironsightcontroller.cpp"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_ironsightcontroller.h"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_knife.cpp"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_knife.h"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_m3.cpp"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_sg552.cpp"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_smokegrenade.cpp"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_smokegrenade.h"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_xm1014.cpp"
+
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_sawedoff.cpp"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_taser.cpp"
+
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_molotov.h"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_molotov.cpp"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_decoy.h"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_decoy.cpp"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_sensorgrenade.h"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_sensorgrenade.cpp"
+
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_nova.cpp"
+				$File	"$SRCDIR\game\shared\cstrike15\molotov_projectile.cpp"
+				$File	"$SRCDIR\game\shared\cstrike15\molotov_projectile.h"
+				$File	"$SRCDIR\game\shared\cstrike15\decoy_projectile.cpp"
+				$File	"$SRCDIR\game\shared\cstrike15\decoy_projectile.h"
+				$File	"$SRCDIR\game\shared\cstrike15\smokegrenade_projectile.cpp"
+				$File	"$SRCDIR\game\shared\cstrike15\smokegrenade_projectile.h"
+
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_baseitem.cpp"
+				$File	"$SRCDIR\game\shared\cstrike15\weapon_baseitem.h"
+				$File	"$SRCDIR\game\shared\cstrike15\item_healthshot.cpp"
+				$File	"$SRCDIR\game\shared\cstrike15\item_healthshot.h"
+				$File	"$SRCDIR\game\shared\cstrike15\sensorgrenade_projectile.cpp"
+				$File	"$SRCDIR\game\shared\cstrike15\sensorgrenade_projectile.h"
+			}
+			
+			$Folder "Effects"
+			{
+				$File	"cstrike15\Effects\clientinferno.cpp"
+				$File	"cstrike15\Effects\clientinferno.h"
+				$File	"cstrike15\Effects\c_chicken.cpp"
+				$File	"cstrike15\Effects\c_chicken.h"
+
+				$Folder "Shared"
+				{
+					$File	"$SRCDIR\game\shared\cstrike15\infernoshared.cpp"
+					$File	"$SRCDIR\game\shared\entityutil.h"
+				}
+			}
+
+			$Folder	"vgui"
+			{
+				$File	"cstrike15\VGUI\bordered_panel.cpp"
+				$File	"cstrike15\VGUI\bordered_panel.h"
+				$File	"cstrike15\VGUI\backgroundpanel.cpp"
+				$File	"cstrike15\VGUI\backgroundpanel.h"
+				$File	"cstrike15\VGUI\buymouseoverpanelbutton.h"
+				$File	"cstrike15\VGUI\counterstrikeviewport.cpp"
+				$File	"cstrike15\VGUI\counterstrikeviewport.h"
+				$File	"cstrike15\VGUI\cstrikebuyequipmenu.cpp"
+				$File	"cstrike15\VGUI\cstrikebuyequipmenu.h"
+				$File	"cstrike15\VGUI\cstrikebuymenu.cpp"
+				$File	"cstrike15\VGUI\cstrikebuymenu.h"
+				$File	"cstrike15\VGUI\cstrikebuysubmenu.h"
+				$File	"cstrike15\VGUI\cstrikeclientscoreboard.cpp"
+				$File	"cstrike15\VGUI\cstrikeclientscoreboard.h"
+				$File	"cstrike15\VGUI\cstrikeloadout.h"
+				$File	"cstrike15\VGUI\cstrikespectatorgui.cpp"
+				$File	"cstrike15\VGUI\cstrikespectatorgui.h"
+				$File	"cstrike15\VGUI\cstriketeammenu.cpp"
+				$File	"cstrike15\VGUI\cstriketeammenu.h"
+				$File	"cstrike15\VGUI\cstriketextwindow.cpp"
+				$File	"cstrike15\VGUI\cstriketextwindow.h"
+				$File	"cstrike15\vgui_c4panel.cpp"
+				$File	"cstrike15\vgui_viewc4panel.cpp"
+				$File	"cstrike15\VGUI\win_panel_round.cpp"
+				$File	"cstrike15\VGUI\win_panel_round.h"
+			}
+
+			$Folder "hltvreplay"
+			{
+				$File "hltvreplaysystem.h"
+				$File "hltvreplaysystem.cpp"
+			}
+		}
+
+		$Folder	"game_controls"
+		{
+			$File	"game_controls\baseviewport.cpp"
+			$File	"game_controls\basemodelpanel.cpp"
+			$File	"game_controls\basemodelpanel.h"
+			$File	"game_controls\basemodel_panel.cpp"
+			$File	"game_controls\basemodel_panel.h"
+			$File	"game_controls\ClientScoreBoardDialog.cpp"
+			$File	"game_controls\commandmenu.cpp"
+			$File	"game_controls\intromenu.cpp"
+			$File	"game_controls\MapOverview.cpp"
+			$File	"game_controls\NavProgress.cpp"
+			$File	"game_controls\SpectatorGUI.cpp"
+			$File	"game_controls\teammenu.cpp"
+			$File	"game_controls\vguitextwindow.cpp"
+			$File	"game_controls\IconPanel.cpp"
+			$File	"game_controls\buymenu.cpp"
+			$File	"game_controls\buysubmenu.cpp"
+			$File	"game_controls\classmenu.cpp"
+		}
+	}
+
+	$Folder	"Additional Link Libraries"
+	{
+		$Lib	"$LIBPUBLIC\meshutils"
+		$Lib 	"$LIBCOMMON\jpeglib" [$WINDOWS||$POSIX]
+		$Lib 	"$LIBPUBLIC\vpklib" [$WINDOWS||$POSIX]
+		$Lib	"$LIBPUBLIC\matsys_controls"
+		$ImplibExternal	steam_api							[ ( $WIN32 || $POSIX || $PS3 ) && !$NO_STEAM ]
+		$ImplibExternal	steam_api64							[ $WIN64 && !$NO_STEAM ]
+
+		$Lib	"$LIBPUBLIC\tier2"
+		$Lib	"$LIBPUBLIC\tier3"
+		$Lib	"$LIBPUBLIC\vgui_controls"
+		$Lib	"$LIBPUBLIC\vtf"	
+		$Lib	"$LIBCOMMON\fileextd"		[$WINDOWS && $CEG]
+		$Lib	"$SRCDIR\lib\common\vc7\bzip2"		[!$POSIX && !$WIN64 && !$VS2015]
+		$Lib	"$SRCDIR\lib\common\x64\bzip2"		[!$POSIX &&  $WIN64 && !$VS2015]
+		$Lib	"$SRCDIR\lib\common\vc14\bzip2"		[!$POSIX && !$WIN64 && $VS2015]
+		$Lib	"$SRCDIR\lib\common\vc14\x64\bzip2"		[!$POSIX &&  $WIN64 && $VS2015]
+		$Lib	"$SRCDIR\lib\common\$PLATFORM\bzip2" [$POSIX]
+	}
+}
