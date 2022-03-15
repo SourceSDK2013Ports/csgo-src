@@ -30,22 +30,6 @@ $Configuration
 	}
 }
 
-$Configuration "Debug"
-{
-	$Linker [$WINDOWS]
-	{
-		$AdditionalDependencies			"$BASE $SRCDIR\lib\win32\debug\libcef.lib"
-	}
-}
-
-$Configuration "Release"
-{
-	$Linker [$WINDOWS]
-	{
-		$AdditionalDependencies			"$BASE $SRCDIR\lib\win32\release\libcef.lib"
-	}
-}
-
 $Project "vguimatsurface"
 {
 	$Folder	"Source Files"
@@ -114,6 +98,7 @@ $Project "vguimatsurface"
 		$Lib vgui_controls
 		$Lib vgui_surfacelib
 		$Lib dmxloader
+		$Lib libcef
 
 		$Lib "$SRCDIR\lib\public\nvtc"			[$WINDOWS && !$WIN64]
 		$Lib "$SRCDIR\lib\public\nvtc64"		[$WIN64]
