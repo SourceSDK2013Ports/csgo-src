@@ -1319,7 +1319,7 @@ bool CCSClientScoreBoardDialog::GetPlayerScoreInfo( int playerIndex, PlayerScore
 	playerScoreInfo.szName = g_PR->GetPlayerName( playerIndex );
 
     playerScoreInfo.playerIndex = playerIndex;
-    playerScoreInfo.frags = g_PR->GetPlayerScore( playerIndex );
+    playerScoreInfo.frags = g_PR->GetKills( playerIndex );
     playerScoreInfo.deaths = g_PR->GetDeaths( playerIndex );
 
     if ( g_PR->GetPing( playerIndex ) < 1 )
