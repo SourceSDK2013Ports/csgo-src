@@ -7231,7 +7231,47 @@ bool CCSPlayer::CSWeaponDrop( CBaseCombatWeapon *pWeapon, Vector targetPos, bool
 
 void CCSPlayer::TransferInventory( CCSPlayer* pTargetPlayer )
 {
-    // as part of transferring inventory, remove what WE have
+	// PiMoN: reverse-engineered from release binaries
+	pTargetPlayer->RemoveAllItems( true );
+
+	for ( int i = 0; i < MAX_WEAPONS; i++ )
+	{
+		CBaseCombatWeapon* pWeapon = dynamic_cast<CBaseCombatWeapon*>(GetWeapon( i ));
+		if ( pWeapon && ((pWeapon->GetWpnData().iFlags & ITEM_FLAG_EXHAUSTIBLE) == 0 || pWeapon->HasAmmo()) )
+		{
+			// PiMoN: was CEconEntity, changed to CWeaponCSBase for a couple of fixes below
+			CWeaponCSBase* pNewWeapon = dynamic_cast<CWeaponCSBase*>(pTargetPlayer->GiveNamedItem( pWeapon->GetName(), 0, pWeapon->GetEconItemView() ));
+			if ( pNewWeapon )
+			{
+				uint64 verylong = pWeapon->GetOriginalOwnerXuid();
+				pNewWeapon->SetOriginalOwnerXuid( (uint32)verylong, (uint32)(verylong >> 32) );
+
+				// PiMoN: everything below is not part of Valve's code
+				pNewWeapon->SetReserveAmmoCount( AMMO_POSITION_PRIMARY, pWeapon->GetReserveAmmoCount( AMMO_POSITION_PRIMARY ), true );
+				pNewWeapon->SetReserveAmmoCount( AMMO_POSITION_SECONDARY, pWeapon->GetReserveAmmoCount( AMMO_POSITION_SECONDARY ), true );
+				pNewWeapon->m_iClip1 = pWeapon->m_iClip1;
+				pNewWeapon->m_iClip2 = pWeapon->m_iClip2;
+				// PiMoN: this also should set silencer, but I don't think that bots ever change it
+			}
+		}
+	}
+
+	if ( HasDefuser() )
+		pTargetPlayer->GiveDefuser();
+	pTargetPlayer->SetArmorValue( ArmorValue() );
+	pTargetPlayer->m_bHasHelmet = m_bHasHelmet;
+	pTargetPlayer->m_bHasHeavyArmor = m_bHasHeavyArmor;
+	pTargetPlayer->m_bHasNightVision = m_bHasNightVision;
+	pTargetPlayer->m_bNightVisionOn = m_bNightVisionOn;
+	pTargetPlayer->m_iAccount = m_iAccount;
+	pTargetPlayer->m_iAccountMoneyEarnedForNextRound = m_iAccountMoneyEarnedForNextRound;
+
+	if ( dev_reportmoneychanges.GetBool() )
+	{
+		Msg( "-- %s\t\t\t(total: %d)\tTransferInventory to %s\n", GetPlayerName(), pTargetPlayer->m_iAccount, pTargetPlayer->GetPlayerName() );
+	}
+
+	// as part of transferring inventory, remove what WE have
 	SetArmorValue( 0 );
 	m_bHasHelmet = false;
 	m_bHasHeavyArmor = false;
