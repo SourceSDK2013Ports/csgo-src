@@ -27,7 +27,7 @@
 
 #define MAX_CSM_CASCADES 3
 
-ConVar cl_csm_enabled( "cl_csm_enabled", "1", FCVAR_DEVELOPMENTONLY, "" );
+ConVar cl_csm_enabled( "cl_csm_enabled", "1", FCVAR_RELEASE, "" );
 ConVar cl_csm_max_shadow_dist("cl_csm_max_shadow_dist", ( IsX360() ) ? "350" : IsPS3() ? "250" : "-1", FCVAR_DEVELOPMENTONLY, "" );
 
 ConVar cl_csm_capture_state( "cl_csm_capture_state", "0", FCVAR_DEVELOPMENTONLY, "" );
