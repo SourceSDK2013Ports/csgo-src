@@ -1,0 +1,10 @@
+"UnlitGeneric"
+{
+	// Original shader: BaseTimesVertexColorAlphaBlendNoOverbright
+// Uncomment this if you add an alpha channel to the base texture
+//	"$translucent" 1
+	"$basetexture" "console/background01_widescreen"
+	"$vertexcolor" 1
+	"$no_fullbright" 1
+	"$ignorez" 1
+}

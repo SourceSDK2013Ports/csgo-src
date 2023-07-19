@@ -1,0 +1,7 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html>
+<head><title>CSGO MOTD</title>
+<style type="text/css">pre{font-family:Verdana,Tahoma;color:#FFFFFF;}body{background:#000000;margin-left:8px;margin-top:0px;}</style>
+</head>
+<body scroll="no"><pre>You are playing Counter-Strike: Global Offensive</pre></body>
+</html>
