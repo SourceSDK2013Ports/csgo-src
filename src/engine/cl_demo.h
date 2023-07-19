@@ -144,6 +144,7 @@ public:
 	float			m_flTotalFPSVariability; // Frame rate variability
 	int				m_nTimeDemoCurrentFrame; // last frame we read a packet
 	int				m_nPacketTick;
+	bool			m_bImportantTicksScanned;
 
 	// benchframe stuff
 	int				m_nSnapshotTick;

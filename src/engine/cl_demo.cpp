@@ -1498,7 +1498,7 @@ netpacket_t *CDemoPlayer::ReadPacket( void )
 
 	Assert( IsPlayingBack() );
 
-	if ( m_nTimeDemoCurrentFrame >= 0 )
+	if ( m_nTimeDemoCurrentFrame >= 0 && !m_bImportantTicksScanned )
 	{
 		// don't scan when doing overwatch
 		if ( !m_pPlaybackParameters || !m_pPlaybackParameters->m_bAnonymousPlayerIdentity )
@@ -1515,6 +1515,8 @@ netpacket_t *CDemoPlayer::ReadPacket( void )
 				BuildHighlightList();
 			}
 		}
+
+		m_bImportantTicksScanned = true;
 	}
 
 	// External editor has paused playback
@@ -2112,7 +2114,8 @@ CDemoPlayer::CDemoPlayer()
 	m_nTimeDemoStartFrame = -1;	
 	m_flTimeDemoStartTime = 0.0f;	
 	m_flTotalFPSVariability = 0.0f;
-	m_nTimeDemoCurrentFrame = -1; 
+	m_nTimeDemoCurrentFrame = -1;
+	m_bImportantTicksScanned = false;
 	m_nPacketTick = 0; // pulling together with broadcast
 	m_bPlayingBack = false;
 	m_bPlaybackPaused = false;
@@ -2245,6 +2248,7 @@ bool CDemoPlayer::StartPlayback( const char *filename, bool bAsTimeDemo, CDemoPl
 	m_nTimeDemoCurrentFrame = -1;
 	m_nTimeDemoStartFrame = -1;
 	m_nPacketTick = 0;
+	m_bImportantTicksScanned = false;
 
 	if ( m_bTimeDemo )
 	{
